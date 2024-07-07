@@ -1,22 +1,30 @@
+// log.go
 package tinylog
 
 import (
-	"os"
+	"io"
 
 	"github.com/Jason-Duffy/tinyfmt"
 )
 
-// Logger is a simple logger struct
+// Logger represents a logger with an output destination.
 type Logger struct {
-	output *os.File
+	output io.Writer
+	name   string
 }
 
-// NewLogger creates a new Logger instance
-func NewLogger(output *os.File) *Logger {
-	return &Logger{output: output}
+// NewLogger creates a new Logger with the specified output.
+func NewLogger(output io.Writer, name string) *Logger {
+	return &Logger{
+		output: output,
+		name:   name,
+	}
 }
 
-// Log logs a formatted message
-func (l *Logger) Log(format string, args ...interface{}) error {
-	return tinyfmt.PrintToIo(l.output, format, args...)
+// Log logs a message to the output.
+func (l *Logger) Log(message string) {
+	var prefix = l.name
+	formattedMessage, _ := tinyfmt.Sprintf("%s: %s\n", prefix, message)
+	l.output.Write([]byte(formattedMessage))
+	print(formattedMessage) // Debug print
 }
