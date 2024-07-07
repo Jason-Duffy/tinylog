@@ -1,7 +1,7 @@
 module github.com/Jason-Duffy/tinylog
 
-go 1.21.4
+go 1.20
 
-require github.com/Jason-Duffy/tinyfmt v0.1.2
+require github.com/Jason-Duffy/tinyfmt v0.2.0
 
-require github.com/Jason-Duffy/tinystrconv v0.1.1 // indirect
+require github.com/Jason-Duffy/tinystrconv v1.0.0 // indirect

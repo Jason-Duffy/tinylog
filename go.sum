@@ -1,4 +1,4 @@
-github.com/Jason-Duffy/tinyfmt v0.1.2 h1:faiMW1z5roud/0oRwUJW0tRKPhYJPqljpZkInMZlJRA=
-github.com/Jason-Duffy/tinyfmt v0.1.2/go.mod h1:1sGE/xO1DAtDLuhUC3cfbK5yYZhuPfqUboieQyMfa04=
-github.com/Jason-Duffy/tinystrconv v0.1.1 h1:Brfe7vQuaTLG/VZcXAjf8t11j5gvFKV1W70FLNDBfLw=
-github.com/Jason-Duffy/tinystrconv v0.1.1/go.mod h1:4tYwGu0e8AChF6V20HwTIP6qtH0dNz9d/o9oOQ84Crs=
+github.com/Jason-Duffy/tinyfmt v0.2.0 h1:geXwqLraUw2FZ0DLivZutucroKRPyeg5etd/Y172KDA=
+github.com/Jason-Duffy/tinyfmt v0.2.0/go.mod h1:buHkFBmuxc13gCo6rvD5Q9TN9T/Zx5VHQSSvKU/HtGM=
+github.com/Jason-Duffy/tinystrconv v1.0.0 h1:XbH8kHCiCd+Ah/Kmabyixrw6NQ8j4YvKaak7M7tSkFE=
+github.com/Jason-Duffy/tinystrconv v1.0.0/go.mod h1:l2ftrRxRAyMddkpXkfR0OecfjebKSLWdiKBUEfmLl2I=
