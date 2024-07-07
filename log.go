@@ -1,3 +1,22 @@
+// =============================================================================
+// Project: tinylog
+// File: log.go
+// Description: A simple, lightweight logging package for Go, intended for use
+// 				on embedded targets.
+// Datasheet/Docs:
+//
+// Author: Jason Duffy
+// Created on: 07/07/2024
+//
+// Copyright: (C) 2024, Jason Duffy
+// License: See LICENSE file in the project root for full license information.
+// Disclaimer: See DISCLAIMER file in the project root for full disclaimer.
+// =============================================================================
+
+// -------------------------------------------------------------------------- //
+//                               Import Statement                             //
+// -------------------------------------------------------------------------- //
+
 package tinylog
 
 import (
@@ -7,8 +26,20 @@ import (
 	"github.com/Jason-Duffy/tinyfmt"
 )
 
+// -------------------------------------------------------------------------- //
+//               Public Consts, Structs & Variable Definitions                //
+// -------------------------------------------------------------------------- //
+
 // LogLevel represents the severity of the log message.
 type LogLevel int
+
+// Logger represents a logger with an output destination.
+type Logger struct {
+	output      io.Writer
+	packageName string
+	level       LogLevel
+	mu          sync.RWMutex
+}
 
 // Define log levels with increasing severity.
 const (
@@ -18,24 +49,24 @@ const (
 	DEBUG   LogLevel = 3
 )
 
+// -------------------------------------------------------------------------- //
+//               Private Consts, Structs & Variable Definitions               //
+// -------------------------------------------------------------------------- //
+
 var (
 	loggingEnabled = true
 	mu             sync.RWMutex
 )
+
+// -------------------------------------------------------------------------- //
+//                              Public Functions                              //
+// -------------------------------------------------------------------------- //
 
 // SetLoggingEnabled sets the global logging enabled state.
 func SetLoggingEnabled(enabled bool) {
 	mu.Lock()
 	defer mu.Unlock()
 	loggingEnabled = enabled
-}
-
-// Logger represents a logger with an output destination.
-type Logger struct {
-	output      io.Writer
-	packageName string
-	level       LogLevel
-	mu          sync.RWMutex
 }
 
 // NewLogger creates a new Logger with the specified output.
