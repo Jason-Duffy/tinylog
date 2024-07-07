@@ -2,6 +2,7 @@ package tinylog
 
 import (
 	"io"
+	"sync"
 
 	"github.com/Jason-Duffy/tinyfmt"
 )
@@ -16,6 +17,18 @@ const (
 	INFO    LogLevel = 2
 	DEBUG   LogLevel = 3
 )
+
+var (
+	loggingEnabled = true
+	mu             sync.RWMutex
+)
+
+// SetLoggingEnabled sets the global logging enabled state.
+func SetLoggingEnabled(enabled bool) {
+	mu.Lock()
+	defer mu.Unlock()
+	loggingEnabled = enabled
+}
 
 // Logger represents a logger with an output destination.
 type Logger struct {
@@ -35,15 +48,23 @@ func NewLogger(output io.Writer, packageName string, level LogLevel) *Logger {
 
 // Log logs a message to the output.
 func (l *Logger) Log(message string) {
+	mu.RLock()
+	defer mu.RUnlock()
+	if !loggingEnabled {
+		return
+	}
 	formattedMessage, _ := tinyfmt.Sprintf("%s > %s\n", l.packageName, message)
 	l.output.Write([]byte(formattedMessage))
 }
 
 // LogLevel logs a message with a specified level to the output.
 func (l *Logger) LogLevel(level LogLevel, message string) {
-	if level <= l.level {
-		levelStr := []string{"ERROR", "WARNING", "INFO", "DEBUG"}[level]
-		formattedMessage, _ := tinyfmt.Sprintf("%s > %s: %s\n", levelStr, l.packageName, message)
-		l.output.Write([]byte(formattedMessage))
+	mu.RLock()
+	defer mu.RUnlock()
+	if !loggingEnabled || level > l.level {
+		return
 	}
+	levelStr := []string{"ERROR", "WARNING", "INFO", "DEBUG"}[level]
+	formattedMessage, _ := tinyfmt.Sprintf("%s > %s: %s\n", levelStr, l.packageName, message)
+	l.output.Write([]byte(formattedMessage))
 }
