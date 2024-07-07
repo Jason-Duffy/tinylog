@@ -18,5 +18,5 @@ func NewLogger(output *os.File) *Logger {
 
 // Log logs a formatted message
 func (l *Logger) Log(format string, args ...interface{}) error {
-	return tinyfmt.PrintToIO(l.output, format, args...)
+	return tinyfmt.PrintToIo(l.output, format, args...)
 }
