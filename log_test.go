@@ -58,38 +58,104 @@ func TestLogger_LogLevel(t *testing.T) {
 	}
 }
 
-// TestLogger_GlobalToggle tests the global toggle for enabling or disabling logging.
 func TestLogger_GlobalToggle(t *testing.T) {
 	var buf bytes.Buffer
 	logger := NewLogger(&buf, "testModule", DEBUG)
 
-	// Disable logging globally
-	SetLoggingEnabled(false)
-	logger.Log("This log should not appear")
-	if buf.String() != "" {
-		t.Errorf("Expected no output but got %q", buf.String())
+	tests := []struct {
+		enabled  bool
+		logLevel LogLevel
+		message  string
+		expected string
+	}{
+		{false, DEBUG, "This log should not appear", ""},
+		{true, DEBUG, "This log should appear", "DEBUG > testModule: This log should appear\n"},
 	}
 
-	// Enable logging globally
-	SetLoggingEnabled(true)
-	logger.Log("This log should appear")
-	expected := "testModule > This log should appear\n"
-	if buf.String() != expected {
-		t.Errorf("Expected %q but got %q", expected, buf.String())
+	for _, tt := range tests {
+		buf.Reset()
+		SetLoggingEnabled(tt.enabled)
+		logger.LogLevel(tt.logLevel, tt.message)
+		if buf.String() != tt.expected {
+			t.Errorf("Expected %q but got %q", tt.expected, buf.String())
+		}
+	}
+}
+
+func TestLogger_SetLogLevel(t *testing.T) {
+	var buf bytes.Buffer
+	logger := NewLogger(&buf, "testModule", ERROR)
+
+	tests := []struct {
+		initialLevel LogLevel
+		newLevel     LogLevel
+		logLevel     LogLevel
+		message      string
+		expected     string
+	}{
+		{ERROR, ERROR, ERROR, "Error message", "ERROR > testModule: Error message\n"},
+		{ERROR, WARNING, WARNING, "Warning message", "WARNING > testModule: Warning message\n"},
+		{WARNING, INFO, INFO, "Info message", "INFO > testModule: Info message\n"},
+		{INFO, DEBUG, DEBUG, "Debug message", "DEBUG > testModule: Debug message\n"},
 	}
 
-	// Test LogLevel function with global toggle
-	buf.Reset()
-	SetLoggingEnabled(false)
-	logger.LogLevel(INFO, "This log should not appear")
-	if buf.String() != "" {
-		t.Errorf("Expected no output but got %q", buf.String())
+	for _, tt := range tests {
+		logger.SetLogLevel(tt.initialLevel)
+		buf.Reset()
+		logger.SetLogLevel(tt.newLevel)
+		logger.LogLevel(tt.logLevel, tt.message)
+		if buf.String() != tt.expected {
+			t.Errorf("Expected %q but got %q", tt.expected, buf.String())
+		}
+	}
+}
+
+func TestLogger_LogLevel_ChangeLevelMultipleTimes(t *testing.T) {
+	var buf bytes.Buffer
+	logger := NewLogger(&buf, "testModule", INFO)
+
+	tests := []struct {
+		newLevel LogLevel
+		logLevel LogLevel
+		message  string
+		expected string
+	}{
+		{ERROR, INFO, "Info message", ""},
+		{ERROR, ERROR, "Error message", "ERROR > testModule: Error message\n"},
+		{DEBUG, DEBUG, "Debug message", "DEBUG > testModule: Debug message\n"},
 	}
 
-	SetLoggingEnabled(true)
-	logger.LogLevel(INFO, "This log should appear")
-	expected = "INFO > testModule: This log should appear\n"
-	if buf.String() != expected {
-		t.Errorf("Expected %q but got %q", expected, buf.String())
+	for _, tt := range tests {
+		logger.SetLogLevel(tt.newLevel)
+		buf.Reset()
+		logger.LogLevel(tt.logLevel, tt.message)
+		if buf.String() != tt.expected {
+			t.Errorf("Expected %q but got %q", tt.expected, buf.String())
+		}
+	}
+}
+
+func TestLogger_GlobalToggle_AfterLogLevelChange(t *testing.T) {
+	var buf bytes.Buffer
+	logger := NewLogger(&buf, "testModule", DEBUG)
+
+	tests := []struct {
+		enabled  bool
+		logLevel LogLevel
+		message  string
+		expected string
+	}{
+		{false, DEBUG, "This log should not appear", ""},
+		{true, ERROR, "Error message", "ERROR > testModule: Error message\n"},
+		{false, ERROR, "This log should not appear", ""},
+	}
+
+	for _, tt := range tests {
+		buf.Reset()
+		SetLoggingEnabled(tt.enabled)
+		logger.LogLevel(tt.logLevel, tt.message)
+		if buf.String() != tt.expected {
+			t.Errorf("Expected %q but got %q", tt.expected, buf.String())
+		}
 	}
 }

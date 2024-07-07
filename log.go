@@ -35,6 +35,7 @@ type Logger struct {
 	output      io.Writer
 	packageName string
 	level       LogLevel
+	mu          sync.RWMutex
 }
 
 // NewLogger creates a new Logger with the specified output.
@@ -44,6 +45,13 @@ func NewLogger(output io.Writer, packageName string, level LogLevel) *Logger {
 		packageName: packageName,
 		level:       level,
 	}
+}
+
+// SetLogLevel sets the log level of the logger.
+func (l *Logger) SetLogLevel(level LogLevel) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.level = level
 }
 
 // Log logs a message to the output.
